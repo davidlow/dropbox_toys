@@ -33,13 +33,38 @@ def main():
         if (isinstance(md, dropbox.files.FolderMetadata)):
             print('Folder: %s' %(n));
 #
+
+def listtree():
+    ACCESS_TOKEN = gettoken();
+    dbx = dropbox.Dropbox(ACCESS_TOKEN);
+
+
+    with open('dropboxtree.dat', 'w') as f:
+        prevpath = '';
+        currpath = '';
+        listofpaths = [''];
+        while ():
+            currpath = getlast(listofpaths);
+            listing = list_folder(dbx, currpath);
+            for l in listing:
+                md = listing[l];
+                if (isinstance(md, dropbox.files.FolderMetadata)):
+                    listofpaths.append(currpath + '/' + md.name);
+                
+
+def getlast(listofstr):
+    if listofstr:
+        return listofstr[-1];
+    return None
+    
+
 def howmanyfiles():
     ACCESS_TOKEN = gettoken();
 
     dbx = dropbox.Dropbox(ACCESS_TOKEN);
 
     with stopwatch('list_folder'):
-        listing = list_folder(dbx, '/TeamCode/Brian Fiddling with DAQ', 
+        listing = list_folder(dbx, '',
                               isrecursive=True);
 
 
@@ -60,7 +85,7 @@ def howmanyfiles():
                 num = num + 1;
                 totalsize = totalsize + md.size;
     print(num);
-    print('total size: %d bytes?' %(totalsize));
+    print('total size: %f Gbytes?' %(totalsize*1e-9));
 
 def list_folder(dbx, path, isrecursive=False):
     """ list a folder
@@ -72,7 +97,8 @@ def list_folder(dbx, path, isrecursive=False):
         with stopwatch('list_folder'):
             res = dbx.files_list_folder(path, recursive=isrecursive);
     except dropbox.exceptions.ApiError as err:
-        print ('Folder listing failed for', path, '-- assumped empty:', err);
+        print ('Folder listing failed for', 
+                path, '-- assumped empty:', err);
         return {}
     else:
         rv = {};
